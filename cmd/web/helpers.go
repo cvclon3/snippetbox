@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"bytes"
+	"time"
 )
 
 
@@ -34,10 +36,22 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 		return
 	}
 
-	w.WriteHeader(status)
+	buf := new(bytes.Buffer)
 
-	err := tmpl.ExecuteTemplate(w, "base", data)
+	err := tmpl.ExecuteTemplate(buf, "base", data)
 	if err != nil {
 		app.serverError(w, err)
+		return
+	}
+
+	w.WriteHeader(status)
+
+	buf.WriteTo(w)
+}
+
+
+func (app *application) newTemplateData(r *http.Request) *templateData {
+	return &templateData{
+		CurrentYear: time.Now().Year(),
 	}
 }

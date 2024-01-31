@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 	"errors"
@@ -24,36 +23,10 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// for _, snippet := range snippets {
-	// 	fmt.Fprintf(w, "%+v\n", snippet)
-	// }
+	data := app.newTemplateData(r)
+	data.Snippets = snippets
 
-	files := []string{
-		"./ui/html/base.tmpl",
-		"./ui/html/partials/nav.tmpl",
-		"./ui/html/pages/home.tmpl",
-	}
-
-	// !!! tmpl = ts in the book
-	tmpl, err := template.ParseFiles(files...)
-	if err != nil {
-		// app.errorLog.Println(err.Error())
-		app.serverError(w, err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError) // 500
-	}
-
-
-	data := &templateData{
-		Snippets: snippets,
-	}
-
-	err = tmpl.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError) // 500
-	}
-
-	// w.Write([]byte("Hello from App"))
+	app.render(w, http.StatusOK, "home.tmpl", data)
 }
 
 
@@ -74,29 +47,10 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"./ui/html/base.tmpl",
-		"./ui/html/partials/nav.tmpl",
-		"./ui/html/pages/view.tmpl",
-	}
+	data := app.newTemplateData(r)
+	data.Snippet = snippet
 
-	tmpl, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := &templateData{
-		Snippet: snippet,
-	}
-
-	err = tmpl.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
-	
-	// fmt.Fprintf(w, "View snippet for ID=%d", id)
-	// fmt.Fprintf(w, "%+v", snippet)
+	app.render(w, http.StatusOK, "view.tmpl", data)
 }
 
 
