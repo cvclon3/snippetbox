@@ -13,6 +13,7 @@ import (
 	"snippetbox.cvclon3.net/internal/models"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-playground/form/v4"
 	"github.com/joho/godotenv"
 )
 
@@ -22,6 +23,7 @@ type application struct {
 	infoLog *log.Logger
 	snippets *models.SnippetModel
 	templateCache map[string]*template.Template
+	formDecoder *form.Decoder
 }
 
 
@@ -59,12 +61,16 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	// FORM DECODER
+	formDecoder := form.NewDecoder()
+
 	// APPLICATION
 	app := &application{
 		errorLog: errorLog,
 		infoLog: infoLog,
 		snippets: &models.SnippetModel{DB: db},
 		templateCache: templateCache,
+		formDecoder: formDecoder,
 	}
 
 	// CUSTOM HTTP SERVER
