@@ -9,11 +9,14 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"snippetbox.cvclon3.net/internal/models"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 )
 
@@ -24,6 +27,7 @@ type application struct {
 	snippets *models.SnippetModel
 	templateCache map[string]*template.Template
 	formDecoder *form.Decoder
+	sessionManager *scs.SessionManager
 }
 
 
@@ -64,6 +68,11 @@ func main() {
 	// FORM DECODER
 	formDecoder := form.NewDecoder()
 
+	// SESSION MANAGER
+	sessionManager := scs.New()
+	sessionManager.Store = mysqlstore.New(db)
+	sessionManager.Lifetime = 12 * time.Hour
+
 	// APPLICATION
 	app := &application{
 		errorLog: errorLog,
@@ -71,6 +80,7 @@ func main() {
 		snippets: &models.SnippetModel{DB: db},
 		templateCache: templateCache,
 		formDecoder: formDecoder,
+		sessionManager: sessionManager,
 	}
 
 	// CUSTOM HTTP SERVER
