@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 	"crypto/tls"
 
@@ -26,6 +25,7 @@ type application struct {
 	errorLog *log.Logger
 	infoLog *log.Logger
 	snippets *models.SnippetModel
+	users *models.UserModel
 	templateCache map[string]*template.Template
 	formDecoder *form.Decoder
 	sessionManager *scs.SessionManager
@@ -80,6 +80,7 @@ func main() {
 		errorLog: errorLog,
 		infoLog: infoLog,
 		snippets: &models.SnippetModel{DB: db},
+		users: &models.UserModel{DB: db},
 		templateCache: templateCache,
 		formDecoder: formDecoder,
 		sessionManager: sessionManager,
@@ -124,31 +125,5 @@ func openDB(dsn string) (*sql.DB, error) {
 }
 
 
-// CUSTOM FILESYSTEM
+// CUSTOM FILESYSTEM (REMOVED)
 // https://www.alexedwards.net/blog/disable-http-fileserver-directory-listings
-type neuteredFileSystem struct {
-    fs http.FileSystem
-}
-
-func (nfs neuteredFileSystem) Open(path string) (http.File, error) {
-    f, err := nfs.fs.Open(path)
-    if err != nil {
-        return nil, err
-    }
-
-    s, err := f.Stat()
-    if s.IsDir() {
-        index := filepath.Join(path, "index.html")
-        if _, err := nfs.fs.Open(index); err != nil {
-            closeErr := f.Close()
-            if closeErr != nil {
-                return nil, closeErr
-            }
-
-            return nil, err
-        }
-    }
-
-    return f, nil
-}    
-// CUSTOM FILESYSTEM END
