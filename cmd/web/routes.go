@@ -23,7 +23,7 @@ func (app *application) routes() http.Handler {
 
 
 	// DYNAMIC MIMIDDLEWARES CHAIN (UNPROTECTED)
-	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf)
+	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
 
 	// STATIC HANDLERS
 	router.Handler(http.MethodGet, "/", dynamic.ThenFunc(app.home))
