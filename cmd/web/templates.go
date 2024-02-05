@@ -4,8 +4,10 @@ import (
 	"html/template"
 	"path/filepath"
 	"time"
+	"io/fs"
 
 	"snippetbox.cvclon3.net/internal/models"
+	"snippetbox.cvclon3.net/ui"
 )
 
 
@@ -35,7 +37,7 @@ var functions = template.FuncMap{
 func newTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
-	pages, err := filepath.Glob("./ui/html/pages/*.tmpl")
+	pages, err := fs.Glob(ui.Files, "html/pages/*.tmpl")
 	if err != nil {
 		return nil, err
 	}
@@ -43,17 +45,13 @@ func newTemplateCache() (map[string]*template.Template, error) {
 	for _, page := range pages {
 		name := filepath.Base(page)
 
-		tmpl, err := template.New(name).Funcs(functions).ParseFiles("./ui/html/base.tmpl")
-		if err != nil {
-			return nil, err
+		patterns := []string{
+			"html/base.tmpl",
+			"html/partials/*tmpl",
+			page,
 		}
 
-		tmpl, err = tmpl.ParseGlob("./ui/html/partials/*.tmpl")
-		if err != nil {
-			return nil, err
-		}
-
-		tmpl, err = tmpl.ParseFiles(page)
+		tmpl, err := template.New(name).Funcs(functions).ParseFS(ui.Files, patterns...)
 		if err != nil {
 			return nil, err
 		}

@@ -3,6 +3,8 @@ package main
 import (
 	"net/http"
 
+	"snippetbox.cvclon3.net/ui"
+
 	"github.com/justinas/alice"
 	"github.com/julienschmidt/httprouter"
 )
@@ -18,8 +20,8 @@ func (app *application) routes() http.Handler {
 	})
 
 	// STATIC
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
-	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
+	fileServer := http.FileServer(http.FS(ui.Files))
+	router.Handler(http.MethodGet, "/static/*filepath", fileServer)
 
 
 	// DYNAMIC MIMIDDLEWARES CHAIN (UNPROTECTED)
