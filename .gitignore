@@ -3,6 +3,7 @@
 
 # Enviroment variables
 .env
+internal/models/.test_env
 
 # Security
 tls/

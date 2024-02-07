@@ -78,7 +78,7 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		exists, err := app.users.Existd(id)
+		exists, err := app.users.Exists(id)
 		if err != nil {
 			app.serverError(w, err)
 			return
