@@ -18,7 +18,11 @@ func (app *application) serverError(w http.ResponseWriter, err error) {
 	// app.errorLog.Println(trace)
 	app.errorLog.Output(2, trace)
 
-	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	if app.debug {
+		http.Error(w, trace, http.StatusInternalServerError)
+	} else {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
 }
 
 

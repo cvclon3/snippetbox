@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"fmt"
@@ -9,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"crypto/tls"
 
 	"snippetbox.cvclon3.net/internal/models"
 
@@ -22,6 +22,7 @@ import (
 
 
 type application struct {
+	debug bool
 	errorLog *log.Logger
 	infoLog *log.Logger
 	snippets models.SnippetModelInterface
@@ -50,6 +51,7 @@ func main() {
 		fmt.Sprintf("%s:%s@/snippetbox?parseTime=true", os.Getenv("DB_USER"), os.Getenv("DB_PASS")), 
 		"MySQL data source name",
 	)
+	debug := flag.Bool("debug", false, "Enable debug mode")
 	flag.Parse()
 
 	// DATABASE
@@ -77,6 +79,7 @@ func main() {
 
 	// APPLICATION
 	app := &application{
+		debug: *debug,
 		errorLog: errorLog,
 		infoLog: infoLog,
 		snippets: &models.SnippetModel{DB: db},
