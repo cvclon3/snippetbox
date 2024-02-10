@@ -51,6 +51,7 @@ func (app *application) routes() http.Handler {
 
 	// AUTHENTICATION HANDLERS
 	router.Handler(http.MethodPost, "/user/logout", protected.ThenFunc(app.userLogoutPost))
+	router.Handler(http.MethodGet, "/account/view", protected.ThenFunc(app.accountView))
 
 
 	// STANDART MIDDLEWARES CHAIN
