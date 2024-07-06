@@ -20,18 +20,16 @@ import (
 	"github.com/joho/godotenv"
 )
 
-
 type application struct {
-	debug bool
-	errorLog *log.Logger
-	infoLog *log.Logger
-	snippets models.SnippetModelInterface
-	users models.UserModelInterface
-	templateCache map[string]*template.Template
-	formDecoder *form.Decoder
+	debug          bool
+	errorLog       *log.Logger
+	infoLog        *log.Logger
+	snippets       models.SnippetModelInterface
+	users          models.UserModelInterface
+	templateCache  map[string]*template.Template
+	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
 }
-
 
 func main() {
 	// LOGGERS
@@ -47,8 +45,8 @@ func main() {
 	// FLAGS
 	addr := flag.String("addr", ":4040", "HTTP network address")
 	dsn := flag.String(
-		"dsn", 
-		fmt.Sprintf("%s:%s@/snippetbox?parseTime=true", os.Getenv("DB_USER"), os.Getenv("DB_PASS")), 
+		"dsn",
+		fmt.Sprintf("%s:%s@/snippetbox?parseTime=true", os.Getenv("DB_USER"), os.Getenv("DB_PASS")),
 		"MySQL data source name",
 	)
 	debug := flag.Bool("debug", false, "Enable debug mode")
@@ -59,7 +57,7 @@ func main() {
 	if err != nil {
 		errorLog.Fatal(err)
 	}
-	
+
 	defer db.Close()
 
 	// TEMPLATE CAHCE
@@ -79,13 +77,13 @@ func main() {
 
 	// APPLICATION
 	app := &application{
-		debug: *debug,
-		errorLog: errorLog,
-		infoLog: infoLog,
-		snippets: &models.SnippetModel{DB: db},
-		users: &models.UserModel{DB: db},
-		templateCache: templateCache,
-		formDecoder: formDecoder,
+		debug:          *debug,
+		errorLog:       errorLog,
+		infoLog:        infoLog,
+		snippets:       &models.SnippetModel{DB: db},
+		users:          &models.UserModel{DB: db},
+		templateCache:  templateCache,
+		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
 	}
 
@@ -96,23 +94,20 @@ func main() {
 
 	// CUSTOM HTTP SERVER
 	srv := &http.Server{
-		Addr: *addr,
-		ErrorLog: errorLog,
-		Handler: app.routes(),
+		Addr:      *addr,
+		ErrorLog:  errorLog,
+		Handler:   app.routes(),
 		TLSConfig: tlsConfig,
 		// Timeouts
-		IdleTimeout: time.Minute,
-		ReadTimeout: 5 * time.Second,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
-
 
 	infoLog.Printf("Starting server on %s", *addr)
 	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	errorLog.Fatal(err)
 }
-
-
 
 func openDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
@@ -126,7 +121,6 @@ func openDB(dsn string) (*sql.DB, error) {
 
 	return db, nil
 }
-
 
 // CUSTOM FILESYSTEM (REMOVED)
 // https://www.alexedwards.net/blog/disable-http-fileserver-directory-listings
